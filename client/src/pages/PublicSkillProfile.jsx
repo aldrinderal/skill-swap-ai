@@ -13,11 +13,13 @@ import {
   Send,
   Check,
   CheckCircle2,
-  UserCheck
+  UserCheck,
+  Star
 } from 'lucide-react';
 import Button from '../components/Button';
 import API from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { getUserFeedback } from '../services/feedbackApi';
 
 /**
  * PublicSkillProfile Page (Phase 9)
@@ -41,6 +43,13 @@ export default function PublicSkillProfile() {
   const [actionLoading, setActionLoading] = useState(false);
   const [actionMessage, setActionMessage] = useState({ text: '', type: '' });
 
+  // Reviews State
+  const [reviewsData, setReviewsData] = useState({
+    totalReviews: 0,
+    averageRating: null,
+    feedback: [],
+  });
+
   useEffect(() => {
     let isMounted = true;
 
@@ -58,7 +67,7 @@ export default function PublicSkillProfile() {
         }
 
         // 2. Fetch relationship status
-        const resolvedTargetUserId = profileRes.data.profile.userId || userId;
+        const resolvedTargetUserId = profileRes.data.profile?.userId || userId;
         try {
           const statusRes = await API.get(`/connections/status/${resolvedTargetUserId}`);
           if (isMounted && statusRes.data.success) {
@@ -69,6 +78,20 @@ export default function PublicSkillProfile() {
           }
         } catch {
           // If status fails, fall back to not_connected
+        }
+
+        // 3. Fetch user reviews and rating
+        try {
+          const feedbackRes = await getUserFeedback(resolvedTargetUserId);
+          if (isMounted && feedbackRes.success) {
+            setReviewsData({
+              totalReviews: feedbackRes.totalReviews || 0,
+              averageRating: feedbackRes.averageRating,
+              feedback: feedbackRes.feedback || [],
+            });
+          }
+        } catch {
+          // Non-fatal
         }
       } catch (err) {
         if (isMounted) {
@@ -245,6 +268,32 @@ export default function PublicSkillProfile() {
               <p className="text-xs text-slate-400 font-medium">
                 Skill Swap AI Community Learner
               </p>
+              {reviewsData.totalReviews > 0 ? (
+                <div className="flex items-center gap-1.5 pt-1">
+                  <div className="flex items-center text-amber-400">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`w-3.5 h-3.5 ${
+                          star <= Math.round(reviewsData.averageRating)
+                            ? 'fill-amber-400 text-amber-400'
+                            : 'text-slate-300 dark:text-slate-600'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {reviewsData.averageRating}
+                  </span>
+                  <span className="text-[11px] text-slate-400">
+                    ({reviewsData.totalReviews} review{reviewsData.totalReviews === 1 ? '' : 's'})
+                  </span>
+                </div>
+              ) : (
+                <p className="text-[11px] text-slate-400 italic pt-0.5">
+                  No ratings yet
+                </p>
+              )}
             </div>
           </div>
 
@@ -375,6 +424,58 @@ export default function PublicSkillProfile() {
           </div>
         </div>
       </div>
+
+      {/* Feedback & Reviews (Phase 14) */}
+      {reviewsData.totalReviews > 0 && (
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+              Community Reviews ({reviewsData.totalReviews})
+            </h3>
+            <span className="text-xs font-bold text-amber-600 dark:text-amber-400">
+              {reviewsData.averageRating} ★ Average
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {reviewsData.feedback.map((rev) => (
+              <div
+                key={rev._id}
+                className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-2"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {rev.reviewerId?.name || 'Skill Partner'}
+                  </span>
+                  <div className="flex items-center text-amber-400">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`w-3 h-3 ${
+                          star <= rev.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-600'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                {rev.comment && (
+                  <p className="text-xs text-slate-600 dark:text-slate-300 italic">
+                    "{rev.comment}"
+                  </p>
+                )}
+                <p className="text-[10px] text-slate-400">
+                  {new Date(rev.createdAt).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

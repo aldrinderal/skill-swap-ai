@@ -345,8 +345,8 @@ export const initSocketServer = (httpServer) => {
         if (!meeting) return;
         if (meeting.caller.toString() !== userId && meeting.receiver.toString() !== userId) return;
 
-        if (meeting.status !== 'ended') {
-          meeting.status = 'ended';
+        if (meeting.status !== 'completed' && meeting.status !== 'ended') {
+          meeting.status = 'completed';
           meeting.endReason = 'user_ended';
           meeting.endedAt = new Date();
           await meeting.save();

@@ -9,7 +9,8 @@ import {
   ArrowRight,
   Send,
   CheckCircle2,
-  Loader2
+  Loader2,
+  Star
 } from 'lucide-react';
 import Button from './Button';
 import API from '../services/api';
@@ -28,6 +29,8 @@ export default function UserCard({
   experienceLevel = 'Intermediate',
   availability = 'Weekends',
   preferredSession = 'Evening',
+  averageRating = null,
+  totalReviews = 0,
 }) {
   const [requestStatus, setRequestStatus] = useState('idle'); // 'idle' | 'sending' | 'sent' | 'connected'
   const [errorMessage, setErrorMessage] = useState('');
@@ -90,6 +93,30 @@ export default function UserCard({
             </div>
           </div>
         </div>
+
+        {/* Partner Community Rating (Phase 14 Req 23) */}
+        {totalReviews > 0 && averageRating && (
+          <div className="flex items-center gap-1.5 text-xs mb-3">
+            <div className="flex items-center text-amber-400">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={`w-3.5 h-3.5 ${
+                    star <= Math.round(averageRating)
+                      ? 'fill-amber-400 text-amber-400'
+                      : 'text-slate-300 dark:text-slate-700'
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="font-bold text-slate-800 dark:text-slate-200">
+              {averageRating}
+            </span>
+            <span className="text-slate-400 text-[11px] font-normal">
+              ({totalReviews} review{totalReviews === 1 ? '' : 's'})
+            </span>
+          </div>
+        )}
 
         {/* Bio */}
         {bio && (

@@ -38,4 +38,30 @@ API.interceptors.response.use(
   }
 );
 
+// Feedback API Helpers (Phase 14 Req 28)
+export const submitFeedback = async ({ meetingId, rating, comment }) => {
+  const response = await API.post('/feedback', { meetingId, rating, comment });
+  return response.data;
+};
+
+export const checkFeedback = async (meetingId) => {
+  const response = await API.get(`/feedback/check/${meetingId}`);
+  return response.data;
+};
+
+export const getMeetingFeedback = async (meetingId) => {
+  const response = await API.get(`/feedback/meeting/${meetingId}`);
+  return response.data;
+};
+
+export const getUserFeedback = async (userId) => {
+  const response = await API.get(`/feedback/user/${userId}`);
+  return response.data;
+};
+
+export const getPlatformFeedbackStats = async () => {
+  const response = await API.get('/feedback/stats');
+  return response.data;
+};
+
 export default API;

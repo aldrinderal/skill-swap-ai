@@ -13,6 +13,7 @@ import './models/Connection.js';
 import './models/Meeting.js';
 import './models/MeetingMessage.js';
 import './models/Message.js';
+import './models/Feedback.js';
 
 // Route Handlers
 import healthRoutes from './routes/healthRoutes.js';
@@ -22,6 +23,7 @@ import skillRoutes from './routes/skillRoutes.js';
 import connectionRoutes from './routes/connectionRoutes.js';
 import meetingRoutes from './routes/meetingRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import feedbackRoutes from './routes/feedbackRoutes.js';
 
 // Middlewares
 import { notFound } from './middleware/notFoundMiddleware.js';
@@ -70,6 +72,9 @@ app.use('/api/meetings', meetingRoutes);
 
 // AI Skill Recommendations Routes (Phase 13)
 app.use('/api/ai', aiRoutes);
+
+// Post-Meeting Feedback & Ratings Routes (Phase 14)
+app.use('/api/feedback', feedbackRoutes);
 
 /*
  * ========================================================

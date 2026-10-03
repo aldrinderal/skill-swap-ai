@@ -1,4 +1,5 @@
 import SkillProfile from '../models/SkillProfile.js';
+import Feedback from '../models/Feedback.js';
 import { invalidateUserRecommendationCache } from '../services/aiRecommendationService.js';
 
 const VALID_EXPERIENCE_LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
@@ -345,9 +346,35 @@ export const getAllSkillProfiles = async (req, res, next) => {
       .populate('userId', 'name profileImage bio')
       .sort({ createdAt: -1 });
 
-    const formattedProfiles = profiles
-      .filter((p) => p.userId) // Ensure populated user exists
-      .map((p) => ({
+    const validProfiles = profiles.filter((p) => p.userId);
+    const userIds = validProfiles.map((p) => p.userId._id);
+
+    // Calculate community rating & reviews count from real MongoDB feedback (Phase 14 Req 23)
+    const feedbackStats = await Feedback.aggregate([
+      { $match: { reviewedUserId: { $in: userIds } } },
+      {
+        $group: {
+          _id: '$reviewedUserId',
+          averageRating: { $avg: '$rating' },
+          totalReviews: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const statsMap = new Map();
+    feedbackStats.forEach((stat) => {
+      statsMap.set(stat._id.toString(), {
+        averageRating: Math.round(stat.averageRating * 10) / 10,
+        totalReviews: stat.totalReviews,
+      });
+    });
+
+    const formattedProfiles = validProfiles.map((p) => {
+      const stats = statsMap.get(p.userId._id.toString()) || {
+        averageRating: null,
+        totalReviews: 0,
+      };
+      return {
         id: p._id,
         userId: p.userId._id,
         name: p.userId.name,
@@ -359,7 +386,10 @@ export const getAllSkillProfiles = async (req, res, next) => {
         availability: p.availability,
         preferredSession: p.preferredSession,
         createdAt: p.createdAt,
-      }));
+        averageRating: stats.averageRating,
+        totalReviews: stats.totalReviews,
+      };
+    });
 
     return res.status(200).json({
       success: true,

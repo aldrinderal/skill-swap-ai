@@ -23,6 +23,7 @@ import Meeting from './pages/Meeting';
 import MeetingEnded from './pages/MeetingEnded';
 import Admin from './pages/Admin';
 import Recommendations from './pages/Recommendations';
+import Feedback from './pages/Feedback';
 
 export default function App() {
   return (
@@ -49,6 +50,7 @@ export default function App() {
               <Route path="/requests" element={<Requests />} />
               <Route path="/connections" element={<Connections />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/feedback/:meetingId" element={<Feedback />} />
               <Route path="/meeting-ended" element={<MeetingEnded />} />
               <Route path="/admin" element={<Admin />} />
             </Route>

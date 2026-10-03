@@ -14,11 +14,14 @@ import {
   AlertCircle,
   CheckCircle2,
   Loader2,
-  PlusCircle
+  PlusCircle,
+  Star,
+  MessageSquare
 } from 'lucide-react';
 import Button from '../components/Button';
 import { useAuth } from '../context/AuthContext';
 import API from '../services/api';
+import { getUserFeedback } from '../services/feedbackApi';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -29,6 +32,14 @@ export default function Profile() {
   const [deleting, setDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
+
+  // Reviews & Rating State (Phase 14 Req 22, 25)
+  const [reviewsData, setReviewsData] = useState({
+    totalReviews: 0,
+    averageRating: null,
+    feedback: [],
+  });
+  const [reviewsLoading, setReviewsLoading] = useState(true);
 
   // Load user skill profile
   const fetchSkillProfile = async () => {
@@ -52,9 +63,31 @@ export default function Profile() {
     }
   };
 
+  // Load received partner reviews (Phase 14)
+  const fetchUserReviews = async () => {
+    const currentUserId = user?._id || user?.id;
+    if (!currentUserId) return;
+    try {
+      setReviewsLoading(true);
+      const res = await getUserFeedback(currentUserId);
+      if (res.success) {
+        setReviewsData({
+          totalReviews: res.totalReviews || 0,
+          averageRating: res.averageRating,
+          feedback: res.feedback || [],
+        });
+      }
+    } catch {
+      // Non-fatal
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchSkillProfile();
-  }, []);
+    fetchUserReviews();
+  }, [user]);
 
   // Handle Delete Skill Profile (Section 20)
   const handleDeleteProfile = async () => {
@@ -158,6 +191,43 @@ export default function Profile() {
                 <Mail className="w-3.5 h-3.5 text-slate-400" />
                 {user?.email || 'user@example.com'}
               </p>
+            </div>
+          </div>
+
+          {/* Community Rating Summary (Phase 14 Req 22) */}
+          <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 self-stretch sm:self-auto flex items-center justify-between sm:justify-start gap-4">
+            <div className="space-y-0.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                Community Rating
+              </span>
+              {reviewsLoading ? (
+                <p className="text-xs text-slate-400">Loading rating...</p>
+              ) : reviewsData.totalReviews > 0 ? (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center text-amber-400">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`w-4 h-4 ${
+                          star <= Math.round(reviewsData.averageRating)
+                            ? 'fill-amber-400 text-amber-400'
+                            : 'text-slate-300 dark:text-slate-600'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm font-black text-slate-900 dark:text-white">
+                    {reviewsData.averageRating}
+                  </span>
+                  <span className="text-xs text-slate-400 font-medium">
+                    ({reviewsData.totalReviews} review{reviewsData.totalReviews === 1 ? '' : 's'})
+                  </span>
+                </div>
+              ) : (
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                  No ratings yet
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -283,6 +353,104 @@ export default function Profile() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Feedback From Skill Partners Section (Phase 14 Req 25, 26) */}
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+          <div className="space-y-1">
+            <h3 className="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+              <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+              Feedback From Skill Partners
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Ratings and testimonials left by peers following your 30-minute swap sessions.
+            </p>
+          </div>
+
+          {reviewsData.totalReviews > 0 && (
+            <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800">
+              {reviewsData.averageRating} ★ ({reviewsData.totalReviews})
+            </span>
+          )}
+        </div>
+
+        {reviewsLoading ? (
+          <div className="p-8 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin text-indigo-500" />
+            Loading partner reviews...
+          </div>
+        ) : reviewsData.feedback.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {reviewsData.feedback.map((rev) => (
+              <div
+                key={rev._id}
+                className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-3"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2.5">
+                    {rev.reviewerId?.profileImage ? (
+                      <img
+                        src={rev.reviewerId.profileImage}
+                        alt={rev.reviewerId?.name || 'Reviewer'}
+                        className="w-8 h-8 rounded-xl object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 font-bold text-xs flex items-center justify-center">
+                        {rev.reviewerId?.name?.charAt(0) || 'U'}
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-xs font-bold text-slate-900 dark:text-white">
+                        {rev.reviewerId?.name || 'Skill Partner'}
+                      </p>
+                      <p className="text-[10px] text-slate-400">
+                        {new Date(rev.createdAt).toLocaleDateString(undefined, {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center text-amber-400">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`w-3.5 h-3.5 ${
+                          star <= rev.rating
+                            ? 'fill-amber-400 text-amber-400'
+                            : 'text-slate-300 dark:text-slate-600'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {rev.comment ? (
+                  <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed italic">
+                    "{rev.comment}"
+                  </p>
+                ) : (
+                  <p className="text-xs text-slate-400 italic">
+                    No written comment provided.
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* Empty State (Req 26) */
+          <div className="p-8 text-center rounded-2xl bg-slate-50 dark:bg-slate-800/30 border border-dashed border-slate-200 dark:border-slate-700 space-y-2">
+            <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+              No feedback yet.
+            </p>
+            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+              Complete a skill-swap session to start receiving feedback and building your community reputation.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Confirmation Modal for Deletion (Section 20) */}

@@ -1,9 +1,20 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { CheckCircle2, Clock, Users, ArrowRight, Sparkles, Star } from 'lucide-react';
+import { Link, useSearchParams, useLocation } from 'react-router-dom';
+import { CheckCircle2, Clock, Users, ArrowRight, Sparkles, Star, MessageSquare } from 'lucide-react';
 import Button from '../components/Button';
 
+/**
+ * MeetingEnded Page (Phase 11 & Phase 14)
+ * Post-meeting summary with direct integration into Partner Feedback & Rating
+ */
 export default function MeetingEnded() {
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+
+  const meetingId = searchParams.get('meetingId') || location.state?.meetingId;
+  const partnerName = location.state?.partnerName || 'Skill Partner';
+  const skillsExchanged = location.state?.skillsExchanged || 'Knowledge & Skills Shared';
+
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
       <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none text-center space-y-6">
@@ -43,43 +54,60 @@ export default function MeetingEnded() {
               <Users className="w-3.5 h-3.5 text-slate-400" /> Skill Partner
             </span>
             <span className="font-bold text-slate-800 dark:text-slate-200">
-              Rahul Sharma
+              {partnerName}
             </span>
           </div>
           <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
             <span className="text-slate-500">Skills Traded</span>
             <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-              MERN Stack &harr; UI/UX
+              {skillsExchanged}
             </span>
           </div>
         </div>
 
-        {/* Quick Rate Feedback */}
-        <div className="space-y-1.5 pt-1">
-          <p className="text-[11px] font-semibold text-slate-500">How was your session?</p>
-          <div className="flex items-center justify-center gap-1.5 text-amber-400">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                type="button"
-                className="hover:scale-125 transition-transform"
-                onClick={() => alert(`Thanks for rating ${star} stars!`)}
-              >
-                <Star className="w-5 h-5 fill-amber-400" />
-              </button>
-            ))}
+        {/* Feedback CTA Block (Phase 14 Req 18) */}
+        <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 space-y-3">
+          <div className="space-y-1 text-center">
+            <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+              How was your session?
+            </p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              Help build trust in the community by rating your partner.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2 pt-1">
+            {meetingId ? (
+              <Link to={`/feedback/${meetingId}`} className="block">
+                <Button variant="primary" size="md" fullWidth icon={Star}>
+                  Rate Your Partner
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/connections" className="block">
+                <Button variant="primary" size="md" fullWidth icon={Star}>
+                  Rate Your Partner
+                </Button>
+              </Link>
+            )}
+
+            <Link to="/connections" className="block">
+              <Button variant="ghost" size="sm" fullWidth className="text-slate-500 hover:text-slate-700">
+                Skip for Now
+              </Button>
+            </Link>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-3 pt-2">
+        <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
           <Link to="/connections" className="block">
-            <Button variant="primary" size="md" fullWidth icon={Users}>
+            <Button variant="outline" size="md" fullWidth icon={Users}>
               Back to Connections
             </Button>
           </Link>
           <Link to="/skills" className="block">
-            <Button variant="outline" size="md" fullWidth icon={ArrowRight}>
+            <Button variant="ghost" size="sm" fullWidth icon={ArrowRight}>
               Find Another Skill
             </Button>
           </Link>

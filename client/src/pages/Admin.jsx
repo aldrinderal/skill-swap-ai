@@ -10,14 +10,17 @@ import {
   Database, 
   Server, 
   Cpu,
-  Clock
+  Clock,
+  Star
 } from 'lucide-react';
 import Button from '../components/Button';
 import API from '../services/api';
+import { getPlatformFeedbackStats } from '../services/feedbackApi';
 
 export default function Admin() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [dbStatus, setDbStatus] = useState({ connected: true, name: 'skillswap_ai' });
+  const [feedbackStats, setFeedbackStats] = useState({ totalReviews: 0, averagePlatformRating: null });
 
   const checkStatus = async () => {
     try {
@@ -28,13 +31,25 @@ export default function Admin() {
     } catch (e) {
       setDbStatus({ connected: false, name: '' });
     }
+
+    try {
+      const fRes = await getPlatformFeedbackStats();
+      if (fRes?.success) {
+        setFeedbackStats({
+          totalReviews: fRes.totalReviews || 0,
+          averagePlatformRating: fRes.averagePlatformRating,
+        });
+      }
+    } catch {
+      // Non-fatal
+    }
   };
 
   useEffect(() => {
     checkStatus();
   }, []);
 
-  // Statistics placeholder values (requirement 18: use 0 or clearly labeled placeholders)
+  // Platform metrics & feedback statistics (Phase 14 Section 32)
   const stats = [
     {
       title: 'Total Users',
@@ -51,6 +66,22 @@ export default function Admin() {
       icon: Layers,
       badge: 'Phase 16 API',
       color: 'violet',
+    },
+    {
+      title: 'Total Reviews',
+      value: feedbackStats.totalReviews.toString(),
+      description: 'Peer feedback ratings submitted',
+      icon: Star,
+      badge: 'Phase 14 ✅',
+      color: 'amber',
+    },
+    {
+      title: 'Platform Rating',
+      value: feedbackStats.averagePlatformRating ? `${feedbackStats.averagePlatformRating} ★` : 'N/A',
+      description: 'Community average score (out of 5)',
+      icon: Star,
+      badge: 'Phase 14 ✅',
+      color: 'emerald',
     },
     {
       title: 'Connection Requests',

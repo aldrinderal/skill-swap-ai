@@ -381,6 +381,8 @@ export default function Skills() {
                 experienceLevel={partner.experienceLevel}
                 availability={partner.availability}
                 preferredSession={partner.preferredSession}
+                averageRating={partner.averageRating}
+                totalReviews={partner.totalReviews}
               />
             ))}
           </div>

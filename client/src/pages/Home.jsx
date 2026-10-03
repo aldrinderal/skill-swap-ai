@@ -25,13 +25,18 @@ import {
   CheckCircle2,
   GraduationCap,
   BookOpen,
-  Users
+  Users,
+  Star,
 } from 'lucide-react';
 import Button from '../components/Button';
 import SkillCard from '../components/SkillCard';
 import AIRecommendations from '../components/AIRecommendations';
+import { useAuth } from '../context/AuthContext';
+import { getUserFeedback } from '../services/feedbackApi';
 
 export default function Home() {
+  const { user } = useAuth();
+
   // Temporary Phase 3 backend connection verification
   const [apiHealth, setApiHealth] = useState(null);
 
@@ -42,6 +47,14 @@ export default function Home() {
   // Authenticated user connections count state (Phase 9 Section 38)
   const [connectionsCount, setConnectionsCount] = useState(null);
   const [connectionsLoading, setConnectionsLoading] = useState(true);
+
+  // User Dashboard Rating & Session Statistics (Phase 14 Req 24)
+  const [userStats, setUserStats] = useState({
+    sessionsCompleted: 0,
+    totalReviews: 0,
+    averageRating: null,
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
 
   useEffect(() => {
     API.get('/health')
@@ -82,7 +95,28 @@ export default function Home() {
       .finally(() => {
         setConnectionsLoading(false);
       });
-  }, []);
+
+    // Check user's sessions & rating statistics (Phase 14 Req 24)
+    const currentUserId = user?._id || user?.id;
+    if (currentUserId) {
+      getUserFeedback(currentUserId)
+        .then((res) => {
+          if (res.success) {
+            setUserStats({
+              sessionsCompleted: res.sessionsCompleted || 0,
+              totalReviews: res.totalReviews || 0,
+              averageRating: res.averageRating,
+            });
+          }
+        })
+        .catch(() => {})
+        .finally(() => {
+          setStatsLoading(false);
+        });
+    } else {
+      setStatsLoading(false);
+    }
+  }, [user]);
   // Popular skill catalog data array
   const popularSkills = [
     {
@@ -355,6 +389,60 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* User Dashboard Statistics (Phase 14 Req 24) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {/* Sessions Completed */}
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+              <Video className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Sessions Completed
+              </p>
+              <p className="text-2xl font-black text-slate-900 dark:text-white font-mono mt-0.5">
+                {statsLoading ? '...' : userStats.sessionsCompleted}
+              </p>
+            </div>
+          </div>
+
+          {/* Reviews Received */}
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+              <MessageSquare className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Reviews Received
+              </p>
+              <p className="text-2xl font-black text-slate-900 dark:text-white font-mono mt-0.5">
+                {statsLoading ? '...' : userStats.totalReviews}
+              </p>
+            </div>
+          </div>
+
+          {/* Average Rating */}
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <Star className="w-6 h-6 fill-emerald-500 text-emerald-500" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Average Rating
+              </p>
+              <p className="text-2xl font-black text-slate-900 dark:text-white font-mono mt-0.5">
+                {statsLoading
+                  ? '...'
+                  : userStats.averageRating
+                  ? `${userStats.averageRating} ★`
+                  : 'No ratings yet'}
+              </p>
             </div>
           </div>
         </div>

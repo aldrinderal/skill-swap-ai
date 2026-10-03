@@ -7,7 +7,8 @@ import {
   ShieldAlert, 
   CheckCircle2, 
   ArrowLeft,
-  Loader2
+  Loader2,
+  Star
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
@@ -86,7 +87,7 @@ export default function Meeting() {
         if (res.success && res.meeting) {
           setMeeting(res.meeting);
 
-          if (res.meeting.status === 'ended' || res.meeting.status === 'rejected' || res.meeting.status === 'missed') {
+          if (res.meeting.status === 'completed' || res.meeting.status === 'ended' || res.meeting.status === 'rejected' || res.meeting.status === 'missed') {
             setMeetingEnded(true);
             setEndReason(res.meeting.endReason || 'ended');
           }
@@ -608,11 +609,18 @@ export default function Meeting() {
                 : 'The meeting session has ended.'}
             </p>
           </div>
-          <Link to="/meeting-ended" className="block pt-2">
-            <Button variant="primary" size="md" fullWidth>
-              View Session Summary
-            </Button>
-          </Link>
+          <div className="space-y-2 pt-2">
+            <Link to={`/feedback/${meetingId}`} className="block">
+              <Button variant="primary" size="md" fullWidth icon={Star}>
+                Rate Your Partner
+              </Button>
+            </Link>
+            <Link to={`/meeting-ended?meetingId=${meetingId}`} className="block">
+              <Button variant="outline" size="md" fullWidth>
+                View Session Summary
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     );

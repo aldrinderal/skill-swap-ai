@@ -184,7 +184,7 @@ export const getMeeting = async (req, res) => {
 
       // Automatic meeting termination if time reached (Section 39)
       if (remainingSeconds <= 0 && meeting.status === 'active') {
-        meeting.status = 'ended';
+        meeting.status = 'completed';
         meeting.endReason = 'timeout';
         meeting.endedAt = new Date();
         await meeting.save();
@@ -256,7 +256,7 @@ export const acceptMeeting = async (req, res) => {
         try {
           const activeMeeting = await Meeting.findById(meeting._id);
           if (activeMeeting && activeMeeting.status === 'active') {
-            activeMeeting.status = 'ended';
+            activeMeeting.status = 'completed';
             activeMeeting.endReason = 'timeout';
             activeMeeting.endedAt = new Date();
             await activeMeeting.save();
@@ -349,8 +349,8 @@ export const endMeeting = async (req, res) => {
       });
     }
 
-    if (meeting.status !== 'ended') {
-      meeting.status = 'ended';
+    if (meeting.status !== 'completed' && meeting.status !== 'ended') {
+      meeting.status = 'completed';
       meeting.endReason = 'user_ended';
       meeting.endedAt = new Date();
       await meeting.save();

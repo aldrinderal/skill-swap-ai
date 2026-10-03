@@ -19,8 +19,8 @@ const meetingSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: {
-        values: ['ringing', 'active', 'ended', 'rejected', 'missed'],
-        message: '{VALUE} is not a valid meeting status. Allowed: ringing, active, ended, rejected, missed',
+        values: ['ringing', 'active', 'ended', 'completed', 'rejected', 'missed'],
+        message: '{VALUE} is not a valid meeting status. Allowed: ringing, active, ended, completed, rejected, missed',
       },
       default: 'ringing',
     },
