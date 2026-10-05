@@ -15,13 +15,22 @@ const onlineUsers = new Map();
  * @param {import('http').Server} httpServer
  */
 export const initSocketServer = (httpServer) => {
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  const rawClientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  const allowedOrigins = rawClientUrl
+    .split(',')
+    .map((url) => url.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
 
   io = new Server(httpServer, {
     cors: {
       origin: (origin, callback) => {
-        // Allow requests from clientUrl, localhost variants in dev, or no origin (like mobile/curl)
-        if (!origin || origin === clientUrl || /^http:\/\/localhost:(5173|5174|5175|3000)$/.test(origin)) {
+        if (!origin) return callback(null, true);
+        const normalized = origin.replace(/\/+$/, '');
+        if (
+          allowedOrigins.includes(normalized) ||
+          /^http:\/\/localhost:(5173|5174|5175|3000)$/.test(normalized) ||
+          normalized.endsWith('.vercel.app')
+        ) {
           callback(null, true);
         } else {
           callback(new Error('CORS not allowed for Socket.IO origin'));
