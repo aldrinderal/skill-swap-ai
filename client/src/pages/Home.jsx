@@ -253,6 +253,44 @@ export default function Home() {
     },
   ];
 
+  const teamMembers = [
+    {
+      name: 'Aldrin Deral',
+      role: 'Project Lead & Architecture',
+      initials: 'AD',
+      gradient: 'from-blue-600 to-indigo-600',
+      badge: 'Team Lead',
+    },
+    {
+      name: 'Akash Durai',
+      role: 'Frontend UI/UX Design',
+      initials: 'AK',
+      gradient: 'from-indigo-600 to-violet-600',
+      badge: 'Frontend',
+    },
+    {
+      name: 'Devandiran',
+      role: 'Backend API & Database',
+      initials: 'DV',
+      gradient: 'from-violet-600 to-purple-600',
+      badge: 'Backend & DB',
+    },
+    {
+      name: 'Deepak Kumar',
+      role: 'WebRTC Video & Media Services',
+      initials: 'DK',
+      gradient: 'from-emerald-600 to-teal-600',
+      badge: 'WebRTC',
+    },
+    {
+      name: 'Dharesh',
+      role: 'Socket.IO & Real-Time Sync',
+      initials: 'DH',
+      gradient: 'from-amber-600 to-orange-600',
+      badge: 'Real-Time',
+    },
+  ];
+
   return (
     <div className="space-y-24 py-6 sm:py-10">
       {/* Temporary Phase 3 Backend Health Status Banner */}
@@ -354,7 +392,7 @@ export default function Home() {
                     R
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-slate-800 dark:text-white">Rahul (MERN Dev)</p>
+                    <p className="text-xs font-bold text-slate-800 dark:text-white">Aldrin Deral (MERN Dev)</p>
                     <p className="text-[11px] text-emerald-600 font-medium">Teaches: Full Stack MERN</p>
                     <p className="text-[11px] text-indigo-500 font-medium">Wants: UI/UX Design</p>
                   </div>
@@ -375,7 +413,7 @@ export default function Home() {
                     Y
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-slate-800 dark:text-white">You (Designer)</p>
+                    <p className="text-xs font-bold text-slate-800 dark:text-white">Akash Durai (Designer)</p>
                     <p className="text-[11px] text-emerald-600 font-medium">Teaches: UI/UX Design</p>
                     <p className="text-[11px] text-indigo-500 font-medium">Wants: Full Stack MERN</p>
                   </div>
@@ -676,6 +714,52 @@ export default function Home() {
               </div>
             );
           })}
+        </div>
+      </section>
+
+      {/* Prototype Team Showcase: TEAM AD */}
+      <section id="team" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24">
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60 mb-3 shadow-xs">
+            <Users2 className="w-3.5 h-3.5" />
+            <span>Prototype Development Project</span>
+          </div>
+          <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            Meet <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-600">TEAM AD</span>
+          </h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+            The project team behind Skill Swap AI &mdash; building collaborative peer-to-peer knowledge sharing.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+          {teamMembers.map((member, idx) => (
+            <div
+              key={idx}
+              className="group bg-white dark:bg-slate-800/90 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-700/60 shadow-xs hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-600 transition-all text-center flex flex-col items-center justify-between"
+            >
+              <div className="flex flex-col items-center w-full">
+                {/* Initials Avatar */}
+                <div
+                  className={`w-14 h-14 rounded-2xl bg-gradient-to-tr ${member.gradient} text-white font-bold text-base flex items-center justify-center shadow-md mb-3.5 group-hover:scale-105 transition-transform`}
+                >
+                  {member.initials}
+                </div>
+                <h3 className="font-bold text-slate-900 dark:text-white text-sm">
+                  {member.name}
+                </h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug">
+                  {member.role}
+                </p>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 w-full flex items-center justify-center">
+                <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200/50 dark:border-indigo-800/50 px-2 py-0.5 rounded-full">
+                  {member.badge}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
