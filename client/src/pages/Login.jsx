@@ -45,7 +45,7 @@ export default function Login() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <Link to="/home" className="inline-flex items-center gap-2.5 group">
           <div className="w-11 h-11 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/30 group-hover:scale-105 transition-transform">
-            <Sparkles className="w-6 h-6" />
+            A D
           </div>
           <span className="text-2xl font-black text-slate-900 dark:text-white">
             Skill Swap <span className="text-indigo-600">AI</span>
@@ -54,9 +54,7 @@ export default function Login() {
         <h2 className="mt-6 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
           Welcome Back
         </h2>
-        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-          Login to continue your skill-sharing journey.
-        </p>
+        
       </div>
 
       {/* Main Card */}
