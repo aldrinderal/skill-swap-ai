@@ -11,7 +11,7 @@ export default function Footer() {
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-sm">
-                <Sparkles className="w-4 h-4" />
+                AD
               </div>
               <span className="font-bold text-lg text-slate-900 dark:text-white">
                 Skill Swap AI
@@ -30,8 +30,8 @@ export default function Footer() {
             <Link to="/skills" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
               Find Skills
             </Link>
-            <a href="#how-it-works" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-              About
+            <a href="#team" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+              Team AD
             </a>
             <a href="mailto:support@skillswap.ai" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
               Contact
@@ -39,11 +39,19 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-3">
-          <p>© 2026 Skill Swap AI. All rights reserved.</p>
-          <p className="flex items-center gap-1">
-            Built for learners with <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> & MERN stack
+        
+
+        {/* Prototype Team Credits */}
+        <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/60 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-2">
+          <p className="text-center md:text-left">
+            Developed by <span className="font-semibold text-indigo-600 dark:text-indigo-400">TEAM AD</span> :{' '}
+            <span className="text-slate-700 dark:text-slate-300 font-medium">
+              Aldrin Deral • Akash Durai • Devendiran • Deepak Kumar • Dharesh
+            </span>
           </p>
+
+
+          <p>© 2026 Skill Swap AI. All rights reserved</p>
         </div>
       </div>
     </footer>
