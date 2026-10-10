@@ -64,12 +64,16 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
         {/* Brand Logo */}
         <Link to="/home" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/20 group-hover:scale-105 transition-transform">
-            <Sparkles className="w-5 h-5" />
-          </div>
+          <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center
+  text-white font-bold text-xs tracking-tight
+  border border-slate-700
+  shadow-sm
+  group-hover:scale-105 transition-transform duration-200">
+  AD
+</div>
           <div>
             <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5">
-              Skill Swap <span className="text-indigo-600 dark:text-indigo-400">AI</span>
+              Skill Swap<span className="text-indigo-600 dark:text-indigo-400">AI</span>
             </span>
             <p className="hidden sm:block text-[10px] text-slate-500 font-medium">
               Learn a Skill. Teach a Skill.
